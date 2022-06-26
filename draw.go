@@ -31,7 +31,7 @@ var (
 	colorCounter               = sdl.Color{R: 89, G: 206, B: 200, A: 255}
 	colorMoney                 = sdl.Color{R: 45, G: 135, B: 45, A: 255}
 	colorBomb                  = sdl.Color{R: 255, G: 0, B: 0, A: 255}
-	colorEqDecoy               = sdl.Color{R: 102, G: 34, B: 0, A: 255}
+	colorEqDecoy               = sdl.Color{R: 128, G: 0, B: 128, A: 255}
 	colorEqMolotov             = sdl.Color{R: 255, G: 153, B: 0, A: 255}
 	colorEqIncendiary          = sdl.Color{R: 255, G: 153, B: 0, A: 255}
 	colorInferno               = sdl.Color{R: 255, G: 153, B: 0, A: 100}
@@ -342,8 +342,10 @@ func (app *app) drawInfobars() {
 	app.drawPlaybackSpeedModifier(5, mapYOffset+630)
 }
 
+func (app *app) drawEconomy()
+
 func (app *app) drawInfobar(players []common.Player, x, y int32, color sdl.Color) {
-	var yOffset int32
+	var yOffset int32 = 50
 	for i, player := range players {
 		if player.IsAlive {
 			gfx.BoxColor(app.renderer, x+int32(player.Health)*(mapXOffset/infobarElementHeight), yOffset, x, yOffset+5, color)
@@ -370,13 +372,18 @@ func (app *app) drawInfobar(players []common.Player, x, y int32, color sdl.Color
 		app.drawString(fmt.Sprintf("%v $", player.Money), colorMoney, x+5, yOffset+25)
 		var nadeCounter int32
 		inventory := player.Inventory
+
+		primaryWeaponName := ""
 		for _, w := range inventory {
+			if primaryWeaponName == "" { //Only shows pistol as primary weapon if another weapon is not equipped
+				if w.Class() == demoinfo.EqClassPistols {
+					primaryWeaponName = w.String()
+				}
+			}
 			if w.Class() == demoinfo.EqClassSMG || w.Class() == demoinfo.EqClassHeavy || w.Class() == demoinfo.EqClassRifle {
-				app.drawString(w.String(), color, x+150, yOffset+25)
+				primaryWeaponName = w.String()
 			}
-			if w.Class() == demoinfo.EqClassPistols {
-				app.drawString(w.String(), color, x+150, yOffset+40)
-			}
+
 			if w.Class() == demoinfo.EqClassGrenade {
 				var nadeColor sdl.Color
 				switch w {
@@ -401,6 +408,8 @@ func (app *app) drawInfobar(players []common.Player, x, y int32, color sdl.Color
 				gfx.BoxColor(app.renderer, x+50, yOffset+12, x+45+12, yOffset+12+9, colorBomb)
 			}
 		}
+		app.drawString(primaryWeaponName, color, x+150, yOffset+25)
+
 		kdaInfo := fmt.Sprintf("%v / %v / %v", player.Kills, player.Assists, player.Deaths)
 		app.drawString(kdaInfo, color, x+5, yOffset+40)
 
