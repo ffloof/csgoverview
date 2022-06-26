@@ -26,7 +26,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/tsenart/deadcode v0.0.0-20160724212837-210d2dc333e9 // indirect
-	github.com/veandco/go-sdl2 v0.4.8
+	github.com/veandco/go-sdl2 v0.4.24
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1 // indirect
 	golang.org/x/mod v0.5.0 // indirect
 	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e
