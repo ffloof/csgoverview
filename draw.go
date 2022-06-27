@@ -342,9 +342,13 @@ func (app *app) drawInfobars() {
 	app.drawPlaybackSpeedModifier(5, mapYOffset+630)
 }
 
-func (app *app) drawEconomy()
-
 func (app *app) drawInfobar(players []common.Player, x, y int32, color sdl.Color) {
+	var teamCash int32
+	for _, p := range players {
+		teamCash += int32(p.Money)
+	}
+	app.drawString(fmt.Sprintf("%v $", teamCash), colorMoney, x+5, 10)
+
 	var yOffset int32 = 50
 	for i, player := range players {
 		if player.IsAlive {
@@ -357,25 +361,24 @@ func (app *app) drawInfobar(players []common.Player, x, y int32, color sdl.Color
 		if player.Team == demoinfo.TeamTerrorists {
 			number = (number + 5) % 10
 		}
-		name := fmt.Sprintf("%v %v", number, player.Name)
-		app.drawString(cropStringToN(name, 20), color, x+85, yOffset+10)
+		name := player.Name
+		app.drawString(cropStringToN(name, 20), color, x+5, yOffset+10)
 		color.A = 255
-		app.drawString(fmt.Sprintf("%v", player.Health), color, x+5, yOffset+10)
 		if player.Armor > 0 && player.HasHelmet {
-			app.drawString("H", color, x+35, yOffset+10)
+			app.drawString("Helmet", color, x+5, yOffset+40)
 		} else if player.Armor > 0 {
-			app.drawString("A", color, x+35, yOffset+10)
+			app.drawString("Body", color, x+5, yOffset+40)
 		}
 		if player.HasDefuseKit {
-			app.drawString("D", color, x+50, yOffset+10)
+			app.drawString("Kit", color, x+70, yOffset+40)
 		}
-		app.drawString(fmt.Sprintf("%v $", player.Money), colorMoney, x+5, yOffset+25)
+
 		var nadeCounter int32
 		inventory := player.Inventory
 
-		primaryWeaponName := ""
+		primaryWeaponName := "Knife"
 		for _, w := range inventory {
-			if primaryWeaponName == "" { //Only shows pistol as primary weapon if another weapon is not equipped
+			if primaryWeaponName == "Knife" { //Only shows pistol as primary weapon if another weapon is not equipped
 				if w.Class() == demoinfo.EqClassPistols {
 					primaryWeaponName = w.String()
 				}
@@ -401,17 +404,19 @@ func (app *app) drawInfobar(players []common.Player, x, y int32, color sdl.Color
 					nadeColor = colorEqHE
 				}
 
-				gfx.BoxColor(app.renderer, x+150+nadeCounter*12, yOffset+60, x+150+nadeCounter*12+6, yOffset+60+9, nadeColor)
+				gfx.BoxColor(app.renderer, x+110+nadeCounter*12, yOffset+42, x+110+nadeCounter*12+6, yOffset+42+9, nadeColor)
 				nadeCounter++
 			}
 			if player.HasBomb {
-				gfx.BoxColor(app.renderer, x+50, yOffset+12, x+45+12, yOffset+12+9, colorBomb)
+				gfx.BoxColor(app.renderer, x+180, yOffset+12, x+175+12, yOffset+12+9, colorBomb)
 			}
 		}
-		app.drawString(primaryWeaponName, color, x+150, yOffset+25)
+		if player.IsAlive {
+			app.drawString(primaryWeaponName, color, x+5, yOffset+25)
+		}
 
 		kdaInfo := fmt.Sprintf("%v / %v / %v", player.Kills, player.Assists, player.Deaths)
-		app.drawString(kdaInfo, color, x+5, yOffset+40)
+		app.drawString(kdaInfo, color, x+200, yOffset+10)
 
 		yOffset += infobarElementHeight
 	}
